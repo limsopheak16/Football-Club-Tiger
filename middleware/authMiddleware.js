@@ -1,27 +1,26 @@
 const jwt = require('jsonwebtoken');
 
-const authMiddleware = async (req, res, next) => {
-  // Extract token from header
-  const token = req.header('x-auth-token');
-
-  // Check if no token
+const authMiddleware = (req, res, next) => {
+  const token = req.header('Authorization');
   if (!token) {
+    console.log('No token received');
     return res.status(401).json({ msg: 'No token, authorization denied' });
   }
 
+  const actualToken = token.split(' ')[1]; // Extract the token part
+  if (!actualToken) {
+    console.log('Invalid token format');
+    return res.status(401).json({ msg: 'Token format invalid' });
+  }
+
   try {
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Attach user info from the token to the request
-    req.user = decoded.user;
-
+    const decoded = jwt.verify(actualToken, process.env.JWT_SECRET);
+    req.user = decoded.user; // Assuming the token contains `user` info
     next();
   } catch (err) {
-    console.error(err.message);
+    console.error('Token verification failed:', err.message);
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };
-
 
 module.exports = authMiddleware;
