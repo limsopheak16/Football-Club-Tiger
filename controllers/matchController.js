@@ -17,14 +17,16 @@ exports.getAllMatches = async (req, res) => {
 // Create a match (Admin only)
 exports.createMatch = async (req, res) => {
   try {
-    const { id, teamA, teamB, date, venue, created_by } = req.body;
+    const { id, teamA, teamB, date, venue, chair  } = req.body;
+    const created_by = req.user.id;
+
 
     const existingMatch = await Match.findOne({ id });
     if (existingMatch) {
       return res.status(400).json({ msg: 'Match with this ID already exists.' });
     }
 
-    const match = new Match({ id, teamA, teamB, date, venue, created_by });
+    const match = new Match({ id, teamA, teamB, date, venue, chair, created_by });
     await match.save();
 
     res.status(201).json({ msg: 'Match created successfully.', match });
@@ -38,30 +40,22 @@ exports.createMatch = async (req, res) => {
 exports.updateMatch = async (req, res) => {
   try {
     const { id } = req.params;
-    const { teamA, teamB, date, venue, created_by } = req.body;
+    const { teamA, teamB, date, venue } = req.body;
+    const updated_by = req.user.id; // Extracted from the token
 
     const match = await Match.findOne({ id });
     if (!match) {
       return res.status(404).json({ msg: 'Match not found.' });
     }
 
-    // Update nested fields for teamA and teamB
-    if (teamA) {
-      if (teamA.name !== undefined) match.teamA.name = teamA.name;
-      if (teamA.logo !== undefined) match.teamA.logo = teamA.logo;
-    }
-    if (teamB) {
-      if (teamB.name !== undefined) match.teamB.name = teamB.name;
-      if (teamB.logo !== undefined) match.teamB.logo = teamB.logo;
-    }
-
-    // Update other fields
-    if (date !== undefined) match.date = date;
-    if (venue !== undefined) match.venue = venue;
-    if (created_by !== undefined) match.created_by = created_by;
+    match.teamA = teamA || match.teamA;
+    match.teamB = teamB || match.teamB;
+    match.date = date || match.date;
+    match.venue = venue || match.venue;
+    match.updated_by = updated_by;
+    match.updatedAt = new Date(); // Automatically set updated timestamp
 
     await match.save();
-
     res.status(200).json({ msg: 'Match updated successfully.', match });
   } catch (err) {
     console.error(err.message);

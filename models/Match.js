@@ -23,10 +23,20 @@ const MatchSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  created_by: {
-    type: String,
-    required: true,
+  chair: {
+    type: Number,
+    required: true
   },
+  created_by: {
+    type : mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  updated_by: {
+    type : mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+
 }, { timestamps: true }); // Enable createdAt and updatedAt
 
 module.exports = mongoose.model('Match', MatchSchema);
