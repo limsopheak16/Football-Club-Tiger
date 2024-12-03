@@ -64,7 +64,7 @@ const loginUser = async (req, res) => {
 
     const payload = { user: { id: user.id, role: user.role } }; // Include role in token
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3h' });
     res.json({
       msg: 'Login successful.',
       user: {

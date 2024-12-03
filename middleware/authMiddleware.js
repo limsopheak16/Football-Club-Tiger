@@ -15,7 +15,7 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(actualToken, process.env.JWT_SECRET);
-    req.user = decoded.user; // Assuming the token contains `user` info
+    req.user = decoded.user; // Attach the user info to req.user
     next();
   } catch (err) {
     console.error('Token verification failed:', err.message);
