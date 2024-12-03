@@ -8,15 +8,17 @@ const {
   deleteMatch,
   getMatchDetail,
 } = require('../controllers/matchController');
-
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 
-// Define routes
-router.get('/', authMiddleware, getAllMatches);
+
+// Admin-only routes
 router.post('/create', authMiddleware, roleMiddleware('admin'), createMatch);
-router.put('/update/:id', authMiddleware, roleMiddleware('admin'), updateMatch); // Updated route for updating match
+router.put('/update/:id', authMiddleware, roleMiddleware('admin'), updateMatch);
 router.delete('/delete/:id', authMiddleware, roleMiddleware('admin'), deleteMatch);
-router.get('/get/:id', authMiddleware, getMatchDetail);
+
+// Public routes
+router.get('/all', authMiddleware, getAllMatches);
+router.get('/:id', authMiddleware, getMatchDetail);
 
 module.exports = router;
