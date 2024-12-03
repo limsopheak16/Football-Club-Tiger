@@ -1,14 +1,22 @@
 const express = require('express');
-const { bookTicket, getAllTickets, updateTicketById ,getTicketById, deleteTicket } = require('../controllers/ticketController');
 const router = express.Router();
+const TicketController = require('../controllers/TicketController');
+const authMiddleware = require('../middleware/authMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
 
-router.post('/book', bookTicket);
-router.get('/all', getAllTickets);
-router.get('/:id', getTicketById);
-router.put('/update/:id', updateTicketById);
-router.delete('/delete/:id', deleteTicket);
-// router.post('/tickets/buy', buyTicket);
+// Get all tickets
+router.get('/all', TicketController.getAllTickets);
 
-// router.get('/tickets-report', getTicketsPerMatchReport);
+// Get ticket details by ID
+router.get('/:id', TicketController.getTicketDetail);
+
+// Create a ticket (Admin only)
+router.post('/create', authMiddleware, roleMiddleware('admin'), TicketController.createTicket);
+
+// Update a ticket (Admin only)
+router.put('/update/:id', authMiddleware, roleMiddleware('admin'), TicketController.updateTicket);
+
+// Delete a ticket (Admin only)
+router.delete('/delete/:id', authMiddleware, roleMiddleware('admin'), TicketController.deleteTicket);
 
 module.exports = router;
